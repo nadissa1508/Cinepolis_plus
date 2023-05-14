@@ -7,6 +7,7 @@
 
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
 #from matplotlib import rcParams
 #import seaborn as sns
 
@@ -116,7 +117,71 @@ def topNoEscritores():
     print(dff10[~dff1-director1stProfession.str.contains('director', na=False)].sort_values(by=['directorName','director1stProfession'], ascending=False,ignore_index=True).head(50))
 
 
+def signIn():
+    
+    if os.path.isfile('usuarios.csv'):
+        #leo el archivo y agrego un nuevo usuario
+        print("\n")
+        print("*" * 30)
+        print('Crear cuenta')
+        print("*" * 30)
+        dfUsuario = pd.read_csv('usuarios.csv')
+        ultimaFila = dfUsuario.tail(1)
+        ultimoId = int(ultimaFila['idUsuario'].values[0])
+        nombre = input ('Ingrese su nombre: ')
+        apellido = input ('Ingrese su apellido: ')
+        correo = input ('Ingrese su correo: ')
+        password = input('Ingrese su contraseña: ')
+        datos = {
+            'idUsuario': (ultimoId + 1),
+            'nombre': nombre,
+            'apellido': apellido,
+            'correo': correo,
+            'password': password,
+        }
+        dfUsuario = pd.concat([dfUsuario, pd.DataFrame(datos, index=[0])], ignore_index=True)
+        dfUsuario.to_csv('usuarios.csv', index=False)
+        print("\nUsuario creado correctamente!")
+        menu1()
+        
+    else:
+        #primer usuario
+        print("\n")
+        print("*" * 30)
+        print('Crear cuenta')
+        print("*" * 30)
+        nombre = input ('Ingrese su nombre: ')
+        apellido = input ('Ingrese su apellido: ')
+        correo = input ('Ingrese su correo: ')
+        password = input('Ingrese su contraseña: ')
+        datos = {
+            'idUsuario': 1,
+            'nombre': nombre,
+            'apellido': apellido,
+            'correo': correo,
+            'password': password,
+        }
+        dfUsuario = pd.DataFrame(datos, index =[0])
+        dfUsuario.to_csv('usuarios.csv', index=False)
+        print("\nUsuario creado correctamente!")
+        menu1()
 
+def logIn():
+    print("\n")
+    print("*" * 30)
+    print("Iniciar Sesión")
+    print("*" * 30)
+    email = input("Ingrese su correo: ")
+    password = input("Ingrese su contraseña: ")
+    dfUsuario = pd.read_csv('usuarios.csv')
+    usuario = dfUsuario.loc[(dfUsuario['correo'] == email) & (dfUsuario['password'] == password)]
+    if ((dfUsuario['correo'] == email) & (dfUsuario['password'] == password)).any():
+        print("\nBienvenid@ " + usuario['nombre'].values[0] + " " + usuario['apellido'].values[0] +"!")
+        menu()
+    else:
+        print("\nCredenciales incorrectas")
+        menu1()
+    
 def menu1():
     print("*" * 30)
     print("BIENVENIDO A CINEPOLIS+!!")
@@ -126,7 +191,6 @@ def menu1():
     if opcion1 == "1":
         signIn()
     elif opcion1 == "2":
-        menu()
         logIn()
     elif opcion1 == "3":
         print("-" * 50)
