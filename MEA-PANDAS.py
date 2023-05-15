@@ -21,11 +21,11 @@ def mostrarInfo():
     print("*" * 30)
     year = input("Ingrese el año de peliculas que desea: \n >")
     df1 = pd.DataFrame(movies, columns=['primaryTitle', 'principalGenre','directorName','startYear'])
-    ok1 = pd.DataFrame(df1.query("startYear=="+ year)).sort_values(by=['primaryTitle'], ascending=False, ignore_index=True)
+    ok1 = df1[df1['startYear'] == year].sort_values(by=['primaryTitle'], ascending=False, ignore_index=True)
     print("*" * 30)
     print("LAS PELICULAS DEL AÑO ", year, "SON:")
     print("*" * 30)
-    print (ok1)
+    print(ok1)
     menu()
 
 #2
@@ -79,6 +79,8 @@ def peliYearCount():
 
 #6 mostrar grafico de barras con la info anterior.
 def graphVoto():
+    df5 = pd.DataFrame(movies, columns=['startYear'])
+    ok5 = df5.groupby('startYear').size().reset_index(name='Total')#.tail(50)
     ax = ok5.plot.barh(x='startYear', y='Total', rot=0)
     ax.plot(kind = 'bar')
     plt.show()
@@ -141,7 +143,7 @@ def signIn():
         }
         dfUsuario = pd.concat([dfUsuario, pd.DataFrame(datos, index=[0])], ignore_index=True)
         dfUsuario.to_csv('usuarios.csv', index=False)
-        print("\nUsuario creado correctamente!")
+        print("\nUsuario creado correctamente!\n")
         menu1()
         
     else:
@@ -191,7 +193,12 @@ def menu1():
     if opcion1 == "1":
         signIn()
     elif opcion1 == "2":
-        logIn()
+        if os.path.isfile('usuarios.csv'):
+            logIn()
+        else:
+            print("\nError, no existen usuarios en el sistema!\n")
+            menu1()
+            
     elif opcion1 == "3":
         print("-" * 50)
         print("Gracias por usar Cinepolis+ !")
